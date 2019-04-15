@@ -15,6 +15,7 @@ from .playlists import GMusicPlaylistsProvider
 from .repeating_timer import RepeatingTimer
 from .scrobbler_frontend import GMusicScrobblerListener
 from .session import GMusicSession
+from .proxy import GmusicProxyServer
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +40,10 @@ class GMusicBackend(
         # do not run playlist refresh around library refresh
         self._refresh_threshold = self._refresh_playlists_rate * 0.3
 
+        self.proxy = GmusicProxyServer(6699)
+
         self.library = GMusicLibraryProvider(backend=self)
-        self.playback = GMusicPlaybackProvider(audio=audio, backend=self)
+        self.playback = GMusicPlaybackProvider(audio=audio, backend=self, proxy=self.proxy)
         self.playlists = GMusicPlaylistsProvider(backend=self)
         self.session = GMusicSession(all_access=config['gmusic']['all_access'])
 
@@ -78,6 +81,8 @@ class GMusicBackend(
                 self._refresh_playlists_rate)
             self._refresh_playlists_timer.start()
 
+        self.proxy.start()
+
     def on_stop(self):
         if self._refresh_library_timer:
             self._refresh_library_timer.cancel()
@@ -86,6 +91,8 @@ class GMusicBackend(
             self._refresh_playlists_timer.cancel()
             self._refresh_playlists_timer = None
         self.session.logout()
+
+        self.proxy.stop()
 
     def increment_song_playcount(self, track_id):
         # Called through GMusicScrobblerListener
