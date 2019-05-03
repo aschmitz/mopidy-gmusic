@@ -623,12 +623,12 @@ class GMusicLibraryProvider(backend.LibraryProvider):
         album = search_album['album']
         uri = 'gmusic:album:' + album['albumId']
         name = album['name']
-        artist = self._aa_search_artist_album_to_mopidy_artist_album(album)
+        artists = ['gmusic:artist:'+artist for artist in album['artistId']]
         date = unicode(album.get('year', 0))
         return Album(
             uri=uri,
             name=name,
-            artists=[artist],
+            artists=artists,
             date=date)
 
     def _aa_search_artist_album_to_mopidy_artist_album(self, album):
