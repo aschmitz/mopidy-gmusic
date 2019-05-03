@@ -628,7 +628,7 @@ class GMusicLibraryProvider(backend.LibraryProvider):
         return Album(
             uri=uri,
             name=name,
-            artists=[artist]
+            artists=[artist],
             date=date)
 
     def _aa_search_artist_album_to_mopidy_artist_album(self, album):
