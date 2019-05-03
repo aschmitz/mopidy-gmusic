@@ -635,7 +635,7 @@ class GMusicLibraryProvider(backend.LibraryProvider):
         name = album.get('albumArtist', '')
         if name.strip() == '':
             name = album.get('artist', '')
-        uri = 'gmusic:artist:' + album.get('artistId')
+        uri = 'gmusic:artist:' + album.get('artistId')[0]
         return Artist(uri=uri, name=name)
 
     def _convert_to_int(self, string):
